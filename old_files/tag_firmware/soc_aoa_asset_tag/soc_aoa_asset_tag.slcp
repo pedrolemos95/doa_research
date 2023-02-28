@@ -1,0 +1,67 @@
+# Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+project_name: soc_aoa_asset_tag
+label: soc_aoa_asset_tag
+description: This sample app demonstrates a CTE (Constant Tone Extension) transmitter
+  that can be used as an asset tag in a Direction Finding setup estimating Angle of
+  Arrival (AoA).
+category: Bluetooth AoX Examples
+package: Bluetooth
+quality: production
+readme:
+- {path: ../../../SimplicityStudio-5/SimplicityStudio_v5/developer/sdks/gecko_sdk_suite/v3.2/app/bluetooth/documentation/example/soc_aoa_asset_tag/readme.html}
+source:
+- {path: main.c}
+- {path: app.c}
+- {path: app_properties.c}
+tag: [prebuilt_demo, 'hardware:rf:band:2400']
+include:
+- path: ''
+  file_list:
+  - {path: app.h}
+sdk: {id: gecko_sdk, version: 3.2.0}
+toolchain_settings: []
+component:
+- {id: app_log}
+- {id: gatt_service_cte_silabs}
+- {id: gatt_service_cte}
+- {id: iostream_retarget_stdio}
+- {id: bluetooth_feature_connection}
+- {id: bluetooth_feature_gatt_server}
+- {id: bluetooth_feature_advertiser}
+- instance: [vcom]
+  id: iostream_usart
+- {id: bluetooth_feature_sm}
+- {id: mpu}
+- {id: bluetooth_feature_system}
+- {id: gatt_configuration}
+- {id: bluetooth_feature_scanner}
+- {id: bluetooth_stack}
+- {id: component_catalog}
+- {id: ota_dfu}
+- {id: brd4184a}
+- {id: bootloader_interface}
+- {id: rail_util_pti}
+- {id: app_assert}
+- {id: bluetooth_feature_gatt}
+- {id: EFR32BG22C224F512IM40}
+other_file:
+- {path: create_bl_files.bat}
+- {path: create_bl_files.sh}
+- {path: readme_img0.png}
+- {path: readme_img1.png}
+- {path: readme_img2.png}
+config_file: []
+configuration:
+- {name: SL_STACK_SIZE, value: '2752'}
+- {name: SL_HEAP_SIZE, value: '9200'}
+- condition: [iostream_usart]
+  name: SL_BOARD_ENABLE_VCOM
+  value: '1'
+- condition: [psa_crypto]
+  name: SL_PSA_KEY_USER_SLOT_COUNT
+  value: '0'
+ui_hints:
+  highlight:
+  - {path: readme.html, focus: true}
+  - {path: config/btconf/gatt_configuration.btconf}
+
