@@ -1,0 +1,3 @@
+[submodule "libdoa/eigen"]
+	path = libdoa/eigen
+	url = https://gitlab.com/libeigen/eigen.git
