@@ -1,0 +1,5 @@
+Estimativa da DMC
+    Escrever as equações do modelo e das derivadas
+    Validar novamente o modelo
+    Entender o problema do condicionamento da função de custo
+    Prototipar as equações

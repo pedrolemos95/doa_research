@@ -1,0 +1,21 @@
+Matriz FIM
+    Interpretação da matriz -> Condicionamento do modelo -> Exemplos
+    Ajuda na decisão da adição ou não de novos percursos
+
+Rimax specular
+    Exemplo com 4 percursos
+
+Novo setup
+    Mudança para a pesquisa da UFSC
+    Compra do MATLAB
+
+Próximos passos
+
+DMC
+    Interpretação e simulação
+
+Validação da simulação de raytracing
+    Verificar se a componente densa surge quando aumentamos o número de reflexões e difrações
+    Verificar se o fading produzido no raytracing obedece as distribuições conhecidas: Rayleigh, Rice e Nakagami
+    Relacionar os parâmetros das distribuições com os parâmetros do canal 
+
