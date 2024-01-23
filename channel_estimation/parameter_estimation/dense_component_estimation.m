@@ -19,17 +19,23 @@ function dmc_parameters = dense_component_estimation(varargin)
     options = optimset('TolFun', 1e-15, 'TolX', 1e-15);
     fun = @(x) 1/cost_function(x, X, Mf, N);
 
+    x0 = x0(1:2);
+
     dmc_parameters = fminsearch(fun, x0);
     
 end
 
 function value = cost_function(dmc_parameters, X, Mf, N)
 
-    Rf = dmc_model(dmc_parameters, Mf, N);
-    % value = (1/((pi^(Mf*N))*det(Rf)^N))*exp(-trace(X'*inv(Rf)*X));
+    dmc_param = [dmc_parameters, 0];
+
+    Rf = dmc_model(dmc_param, Mf, N);
+    % value = (1/((det(pi*Rf)^N)))*exp(-abs(trace(X'*inv(Rf)*X)));
+
+    value = real(-N*log(det(pi*Rf)) -trace(X'*inv(Rf)*X));
 
     % value = exp(-abs(trace(X'*inv(Rf)*X)));
-    value = abs(-N*log(det(Rf)) - abs(trace(X'*inv(Rf)*X)));
+    % value = abs(-N*log(det(Rf)) - abs(trace(X'*inv(Rf)*X)));
 end
 
 function initial_dmc_estimate = estimate_initial_value(X)
@@ -56,12 +62,13 @@ function initial_dmc_estimate = estimate_initial_value(X)
 end
 
 function run_unitary_test()
-    Bd = 10e6; % DMC coherence bandwith
+    Bd = 6e6; % DMC coherence bandwith
     f0 = 2e6; % frequency domain sampling distance
-    Mf = 100; % number of frequency domain samples
+    Mf = 40; % number of frequency domain samples
     Bm = Mf*f0; % Measurement bandwith
     beta_d = Bd/Bm;
-    Td = 250e-9; % Base TDoA of DMC
+    % Td = 250e-9; % Base TDoA of DMC
+    Td = 0; % Base TDoA of DMC
     tm = 10e-6; % length of the observed impulse response
     tau_d = Td/tm;
     alpha_1 = 1e-4;
