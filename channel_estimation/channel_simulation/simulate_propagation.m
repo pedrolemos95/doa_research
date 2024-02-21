@@ -1,4 +1,4 @@
-function rays = simulate_propagation(varargin)
+function [rays, tx_out, rx_out ] = simulate_propagation(varargin)
     % INPUT: ["map_file", "tx_pos", "rx_pos", "num_freq", "num_obs"]. OUTPUT: rays
     if isempty(varargin)
         run_unitary_test();
@@ -9,13 +9,13 @@ function rays = simulate_propagation(varargin)
 
     map = load_map(map_file);
 
-    tx = txsite("cartesian", "AntennaPosition", tx_pos(:,1), "TransmitterFrequency",2.402e9);
-    rx = rxsite("cartesian", "AntennaPosition", rx_pos);
+    tx = txsite("cartesian", "AntennaPosition", tx_pos(:,1), "TransmitterFrequency",2.402e9); tx_out = tx;
+    rx = rxsite("cartesian", "AntennaPosition", rx_pos); rx_out = rx;
     pm = propagationModel("raytracing", ...
         "CoordinateSystem","cartesian", ....
-        "MaxNumReflections",4, ...
+        "MaxNumReflections",7, ...
         "MaxNumDiffractions",0, ...
-        "SurfaceMaterial","concrete"); 
+        "SurfaceMaterial","metal"); 
 
     rp = load_receiver_parameters;
 

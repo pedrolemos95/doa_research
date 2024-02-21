@@ -31,15 +31,15 @@ rp = load_receiver_parameters;
 % simulate propagation rays
 num_observations = numel(tx_pos)/3;
 map_file = "simulation_map_with_ground.stl";
-rays = simulate_propagation(map_file, tx_pos, rx_pos, 1, num_observations);
+[rays,tx,rx] = simulate_propagation(map_file, tx_pos, rx_pos, 1, num_observations);
 strong_rays = remove_weak_rays(rays, -30);
 % rays = get_only_specular_rays(rays, rp.noise_power);
 
 dimensions = [M_1; M_2; M_3];
-% X = arrayfun(@(n) generate_channel_observation(rays{n}, dimensions), 1:num_observations, 'UniformOutput', false);
-X = arrayfun(@(n) generate_channel_observation_with_dmc(rays{n}, dimensions), 1:num_observations, 'UniformOutput', false);
+X = arrayfun(@(n) generate_channel_observation(rays{n}, dimensions), 1:num_observations, 'UniformOutput', false);
+% X = arrayfun(@(n) generate_channel_observation_with_dmc(rays{n}, dimensions), 1:num_observations, 'UniformOutput', false);
 
-%% Analyze PDP
+%% Raw PDP estimate
 Xrz = reshape(X{11}, [M_1 M_2*M_3]);
 
 F = (1/sqrt(M_1))*dftmtx(M_1);
@@ -50,10 +50,15 @@ N = numel(Xt(1,:));
 ht = sum(Xt.*conj(Xt),2)/N;
 
 close all;
-plot(10*log10(ht));
+plot((ht));
+
 
 %% View rays
 
 viewer = siteviewer("SceneModel", load_map(map_file));
 
-plot(strong_rays{1}{1}{1});
+% plot(strong_rays{1}{1}{1});
+
+%% Visualize channel parameters?
+rtchan = comm.RayTracingChannel(rays{1}{1}{1},tx,rx);
+showProfile(rtchan);

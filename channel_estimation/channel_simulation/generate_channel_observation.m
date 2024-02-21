@@ -49,9 +49,9 @@ function [parameters, weight] = get_ray_parameters(ray)
 end
 
 function run_unitary_test()
-    Mf_1 = 4;
-    Ms_2 = 4;
-    Ms_3 = 4;
+    Mf_1 = 40;
+    Ms_2 = 16;
+    Ms_3 = 16;
 
     tx_pos = repmat([3;3;0.5], [1 2]);
     rx_pos = [3;3;4.0];
@@ -61,6 +61,17 @@ function run_unitary_test()
 
     rays = simulate_propagation(map_file, tx_pos, rx_pos, Mf_1, num_obs);
 
-    x = generate_channel_observation(rays{1}, [Mf_1, Ms_2, Ms_3]);
+    X = generate_channel_observation(rays{1}, [Mf_1, Ms_2, Ms_3]);
+
+    Xrz = reshape(X, [Mf_1 Ms_2*Ms_3]);
+
+    F = (1/sqrt(Mf_1))*dftmtx(Mf_1);
+
+    Xt = F'*Xrz;
+
+    N = numel(Xt(1,:));
+    ht = sum(Xt.*conj(Xt),2)/N;
+
+    plot(ht);
 
 end

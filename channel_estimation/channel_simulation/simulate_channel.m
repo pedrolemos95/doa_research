@@ -58,7 +58,7 @@ clearMap(viewer);
 
 n = 16;
 
-norm(remainder{n})^2
+norm(remainder{n})^2;
 
 initial_phys_param = parameter_mapping(path_parameters{1}, "normalized");
 physical_parameters = parameter_mapping(path_parameters{n}, "normalized");
