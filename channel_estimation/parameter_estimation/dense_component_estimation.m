@@ -63,8 +63,8 @@ end
 
 function run_unitary_test()
     Bd = 6e6; % DMC coherence bandwith
-    f0 = 2e6; % frequency domain sampling distance
-    Mf = 40; % number of frequency domain samples
+    f0 = 1e6; % frequency domain sampling distance
+    Mf = 60; % number of frequency domain samples
     Bm = Mf*f0; % Measurement bandwith
     beta_d = Bd/Bm;
     % Td = 250e-9; % Base TDoA of DMC

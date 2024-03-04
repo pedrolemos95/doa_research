@@ -1,4 +1,4 @@
-function [channel_observation, parameters, weights] = generate_channel_observation_with_dmc(varargin)
+function [channel_observation, dmc_out, parameters, weights, dmc_parameters] = generate_channel_observation_with_dmc(varargin)
     % INPUT: ["rays", "dimensions"]. OUTPUT: channel observation
     if isempty(varargin)
         run_unitary_test();
@@ -17,9 +17,9 @@ function [channel_observation, parameters, weights] = generate_channel_observati
     smc = specular_model(parameters, dimensions)*weights;
     noise = wgn(M1*M2*M3, 1, rp.noise_power, 'linear', 'complex');
 
-    dmc_power = 1e-1*sqrt(max(10.^(-([rays{1}{1}.PathLoss])/10))); % 10 db less than the maximum power
+    dmc_power = 1e-3*sqrt(max(10.^(-([rays{1}{1}.PathLoss])/10))); % 10 db less than the maximum power
     channel_coherence_bandwith = 10e6; % in Hz
-    measurement_bandwidth = 100e6; % in Hz
+    measurement_bandwidth = rp.f0*M1; % in Hz
     Bd = channel_coherence_bandwith/measurement_bandwidth;
     tau_d = 0;
     
@@ -27,7 +27,7 @@ function [channel_observation, parameters, weights] = generate_channel_observati
     [ ~ , dmc] = dmc_model(dmc_parameters, M1, M2*M3);
     dmc = dmc(:);
     channel_observation = smc + dmc + noise;
-
+    dmc_out = dmc + noise;
 end
 
 function [parameters, weights] = get_rays_parameters(rays)
