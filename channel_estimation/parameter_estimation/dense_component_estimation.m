@@ -22,6 +22,7 @@ function dmc_parameters = dense_component_estimation(varargin)
     x0 = x0(1:2);
 
     dmc_parameters = fminsearch(fun, x0);
+    dmc_parameters = [dmc_parameters, 0];
     
 end
 

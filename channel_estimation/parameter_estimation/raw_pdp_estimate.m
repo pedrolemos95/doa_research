@@ -1,6 +1,7 @@
 function pdp_estimate = raw_pdp_estimate(varargin)
     if (isempty(varargin))
         run_unitary_test();
+        return;
     end
 
     [channel_observations, dimensions ]= parse_input_parameters(varargin, ["channel_observation", "aperture_dimensions"]);
