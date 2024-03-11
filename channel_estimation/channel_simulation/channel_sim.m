@@ -8,9 +8,9 @@ close all
 
 %% MEASUREMENT SETUP
 % aperture dimensions
-M_1 = 100; % frequency related
-M_2 = 32; % spatial related
-M_3 = 32; % spatial related
+M_1 = 40; % frequency related
+M_2 = 4; % spatial related
+M_3 = 4; % spatial related
 
 % set trajectory
 speed = 4; % [m/s]
@@ -75,4 +75,30 @@ rtchan = comm.RayTracingChannel(rays{1}{1}{1},tx,rx);
 showProfile(rtchan);
 
 %% Estimate channel
-rimax_iteration
+
+path_parameters = cell([1 num_observations]);
+path_weights = cell([1 num_observations]);
+dmc_estimates = cell([1 num_observations]);
+remainders = cell([1 num_observations]);
+
+% Get the L.O.S. parameters
+los_ray = rays{1}{1}{1}(1);
+delay = los_ray.PropagationDelay;
+aoa = (pi/180)*los_ray.AngleOfArrival;
+
+path_parameters{1} = parameter_mapping([delay;flip(aoa)], "physical");
+path_weights{1} = sqrt(10^(-(los_ray.PathLoss)/10))*exp(-1i*los_ray.PhaseShift);
+
+% Get first DMC estimate
+dmc_only_observation = X{1} - specular_model(path_parameters{1}, dimensions)*path_weights{1};
+dmc_estimates{1} = raw_dmc_estimate(reshape(dmc_only_observation, [M_1 M_2*M_3]));
+
+
+noise_covariance = 1e-12*eye(M_1*M_2*M_3);
+
+for n=2:num_observations
+    channel_observation = X{n};
+
+    [path_parameters{n}, path_weights{n}, remainders{n}, dmc_estimates{n}] = rimax_iteration_full(channel_observation, path_parameters{n-1}, ...
+    path_weights{n-1}, noise_covariance, dimensions, dmc_estimates{n-1});
+end
