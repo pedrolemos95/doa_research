@@ -65,11 +65,26 @@ function [path_parameters, path_weights, remainder, dmc_estimate] = rimax_iterat
    
         % discard low SNR paths
         pm = reshape(parameters, [numel(parameters)/3 3]);
-        parameters = pm(SNRS > 10.6724, :);
-        parameters = parameters(:);
-        weights = weights(SNRS > 10.6724);
 
-        paths_discarded = any(SNRS < 10.6724);
+        reamining_paths = numel(pm(:,1));
+        num_paths_to_be_eliminated = numel(pm(SNRS < 10.6724, 1));
+
+        % we cannot eliminate all paths! At least one has to stay. 
+        % Leave the path with highest SNR.
+        if (num_paths_to_be_eliminated == reamining_paths)
+            [~, max_snr_idx] = max(SNRS);
+            parameters = pm(max_snr_idx, :);
+            parameters = parameters(:);
+            weights = weights(max_snr_idx);
+    
+            paths_discarded = true;
+        else
+            parameters = pm(SNRS > 10.6724, :);
+            parameters = parameters(:);
+            weights = weights(SNRS > 10.6724);
+    
+            paths_discarded = any(SNRS < 10.6724);
+        end
     end
 
     path_parameters = parameters;
@@ -96,10 +111,10 @@ function run_unitary_test()
 
     M1 = 40; M2 = 4; M3 = 4;
     dimensions = [M1;M2;M3];
-    noise_power = 1e-10;
+    noise_power = 1e-12;
     noise_covariance = noise_power*eye(M1*M2*M3);
 
-    dmc_power = 5;
+    dmc_power = 1;
     channel_coherence_bandwidth = 6e6;
     f0 = 1e6;
     beta = channel_coherence_bandwidth/(M1*f0);
