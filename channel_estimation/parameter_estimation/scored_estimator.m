@@ -40,7 +40,16 @@ function [parameters, weight, score] = scored_estimator(varargin)
 
     % Remove the path estimate from the observation, in order to get an
     % residue
-    X_res = X - specular_model(parameters, dim)*weight;
+    % X_res = X - specular_model(parameters, dim)*weight;
+
+    % Remove the STRONGEST path estimate from the observation, in order to get an
+    % residue
+    [~, idx] = max(abs(weight)); % get its idx
+    strongest_weight = weight(idx);
+    param_tmp = reshape(parameters, [numel(parameters)/3 3]);
+    param_strongest_path = param_tmp(idx, :).';
+
+    X_res = X - specular_model(param_strongest_path, dim)*strongest_weight;
 
     % The score is a measurement of the relation between the power of the
     % estimated path and the other components. If it is too low the estimate is bad.
