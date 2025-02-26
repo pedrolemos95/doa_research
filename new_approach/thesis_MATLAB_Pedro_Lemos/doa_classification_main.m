@@ -7,7 +7,7 @@ clear; clc; close all;
 
 % physical parameters
 delays = 10*1e-9;
-elevations = 30*(pi/180);
+elevations = 60*(pi/180);
 azimuths = 20*(pi/180);
 
 % Aperture dimensions
@@ -18,13 +18,13 @@ dimensions = [M_1; M_2; M_3];
 
 % number of observations per channel condition. Ex.: If 2 values of K, then
 % 200 observations
-num_observations = 100; 
+num_observations = 300; 
 
 K_high = 4;
 weight = sqrt(K_high/(K_high+1)); % [W^(0.5)]
 sig_rayleigh = 1/(K_high+1); % [W]
 
-K_low = 1;
+K_low = 0.2;
 weight_low = sqrt(K_low/(K_low+1)); % [W^(0.5)]
 sig_rayleigh_low = 1/(K_low+1); % [W]
 
@@ -106,11 +106,56 @@ corr_rssi_low_k = xcorr(10.^(rssis_dbm_low_k), dir_error_low_k, 0, 'normalized')
 corr_score_low_k = xcorr(scores_low_k, dir_error_low_k, 0, 'normalized');
 
 %% Classification step. Eliminate measurements based on K estimate and some arbitrary threshold. How much do we miss?
-K_threshold = K_high*1.1;
+K_threshold = (K_high-K_low)/2*1.1;
 est_k = [est_high_k; est_low_k];
 dir_errors = [dir_error_high_k; dir_error_low_k];
 dir_errors_cleaned = dir_errors(est_k > K_threshold);
+los_est = [los_high_k; los_low_k];
+los_est_class = los_est(est_k > K_threshold);
 
+%% Positioning example
+rx_pos = [0;0;rp.height];
+rx_height = rp.height;
+tx_height = 1.0;
+dz = rx_height - tx_height;
+pos_estimate_fun = @(mu) real(rx_pos + [0;0;tx_height - rx_height] + (dz/(k*sqrt(1 - (mu(2)^2 + mu(3)^2)/k^2)))*[mu(2);mu(3);0]);
+
+% raw estimates
+pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est, 'UniformOutput', false);
+pos_vec = [pos_estimates{:}];
+vec_x = pos_vec(1,:); vec_y = pos_vec(2,:);
+
+scatter(vec_x, vec_y, 'filled');
+hold on;
+% classified estimates
+
+pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est_class, 'UniformOutput', false);
+pos_vec = [pos_estimates{:}];
+scatter(pos_vec(1,:), pos_vec(2,:), 'filled');
+
+tx_x = mean(pos_vec(1,:));
+tx_y = mean(pos_vec(2,:));
+
+xlabel('X estimate [m]', 'FontSize', 12);
+ylabel('Y estimate [m]', 'FontSize', 12);
+
+% Grid and axis styles
+grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
+
+set(gcf, 'Color', 'w'); axis tight;
+
+ylim([-5,5]);
+xlim([-5,5]);
+
+h = scatter(0,0,'filled'); % Locator position
+h.SizeData = 300;
+scatter(tx_x,tx_y,'filled'); % transmitter position
+h.SizeData = 300;
+
+% Legend
+legend({'With classification', 'Without classification', 'Locator Position', 'Real Position'}, ...
+       'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
+print('figs/position_example','-depsc','-painters','-r300');
 %% Write results to "output" folder as csv files
 unclassified_dir_errors_file = "output/dir_errors_before_CL"+ ".csv";
 classified_dir_errors_file = "output/dir_errors_after_CL"+ ".csv";
@@ -122,40 +167,40 @@ writematrix(est_k, estimated_ks_file);
 
 %% Generate figures
 
-% K estimate figure
-hold off; hold on;
-
-plot([K_high*ones([num_observations,1]); (K_low)*ones([num_observations,1])], 'LineWidth', 2);
-plot(readmatrix(estimated_ks_file), 'LineWidth', 2);
-
-xlabel('Sample', 'FontSize', 12);
-ylabel('K estimate', 'FontSize', 12);
-
-% Legend
-legend({'Real', 'Estimated'}, ...
-       'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
-
-% Grid and axis styles
-grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
-
-set(gcf, 'Color', 'w'); axis tight;
-print('figs/estimated_ks','-depsc','-painters','-r300');
-
-% Dir error CDF
-figure
-hold off; hold on;
-h = cdfplot(readmatrix(unclassified_dir_errors_file)); set(h, 'LineWidth', 2); title('');
-h = cdfplot(readmatrix(classified_dir_errors_file)); set(h, 'LineWidth', 2); title('');
-
-% Grid and axis styles
-grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
-
-ylabel('P(X < x)', 'FontSize', 12);
-xlabel('DoA error (º)', 'FontSize', 12);
-
-% Legend
-legend({'Without Classification', 'With Classification'}, ...
-       'Interpreter', 'latex', 'FontSize', 10, 'Location', 'southeast');
-
-set(gcf, 'Color', 'w'); axis tight;
-print('figs/dir_error_cdf','-depsc','-painters','-r300');
+% % K estimate figure
+% hold off; hold on;
+% 
+% plot([K_high*ones([num_observations,1]); (K_low)*ones([num_observations,1])], 'LineWidth', 2);
+% plot(readmatrix(estimated_ks_file), 'LineWidth', 2);
+% 
+% xlabel('Sample', 'FontSize', 12);
+% ylabel('K estimate', 'FontSize', 12);
+% 
+% % Legend
+% legend({'Real', 'Estimated'}, ...
+%        'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
+% 
+% % Grid and axis styles
+% grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
+% 
+% set(gcf, 'Color', 'w'); axis tight;
+% print('figs/estimated_ks','-depsc','-painters','-r300');
+% 
+% % Dir error CDF
+% figure
+% hold off; hold on;
+% h = cdfplot(readmatrix(unclassified_dir_errors_file)); set(h, 'LineWidth', 2); title('');
+% h = cdfplot(readmatrix(classified_dir_errors_file)); set(h, 'LineWidth', 2); title('');
+% 
+% % Grid and axis styles
+% grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
+% 
+% ylabel('P(X < x)', 'FontSize', 12);
+% xlabel('DoA error (º)', 'FontSize', 12);
+% 
+% % Legend
+% legend({'Without Classification', 'With Classification'}, ...
+%        'Interpreter', 'latex', 'FontSize', 10, 'Location', 'southeast');
+% 
+% set(gcf, 'Color', 'w'); axis tight;
+% print('figs/dir_error_cdf','-depsc','-painters','-r300');
