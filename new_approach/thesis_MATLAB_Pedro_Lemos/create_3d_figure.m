@@ -21,11 +21,20 @@ function create_3d_figure(f)
         end
     end
 
+
+    if f.isKey("markerssize")
+        markerssize = f("markerssize");
+        for marker_idx = 1:numel(f("markerssize"))
+            h = handlers{marker_idx}; 
+            h.SizeData = markerssize{marker_idx};
+        end
+    end
+
     if f.isKey("markersfacecolors")
         markersfacecolors = f("markersfacecolors");
-        for mfc_idx = 1:numel(f("markersfacecolors"))
-            h = handlers{mfc_idx}; 
-            h.MarkerFaceColor = markersfacecolors{mfc_idx};
+        for marker_idx = 1:numel(f("markersfacecolors"))
+            h = handlers{marker_idx}; 
+            h.MarkerFaceColor = markersfacecolors{marker_idx};
         end
     end
 
@@ -63,22 +72,28 @@ function create_3d_figure(f)
         text(2.2, 4, f("tabletext"), 'FontSize', 12, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 5);
     end
 
-    % % Grid and axis styles
-    % ax = gca;
-    % grid on;
-    % ax.GridColor = [0.7 0.85 1];       % Light blue color (normalized RGB)
-    % ax.GridAlpha = 1;                  % Fully opaque grid
-    % ax.GridLineStyle = '-';           % Solid lines
-    % ax.Layer = 'bottom';              % Grid behind the data
+    % Grid and axis styles
+    ax = gca;
+    grid on;
+    ax.GridColor = [0.7 0.85 1];       % Light blue color (normalized RGB)
+    ax.GridAlpha = 1;                  % Fully opaque grid
+    ax.GridLineStyle = '-';           % Solid lines
+    ax.Layer = 'bottom';              % Grid behind the data
     
-    % set(gca, 'GridLineStyle', '-'); set(gca, 'GridAlpha', 0.3); set(gca, 'LineWidth', 1);
-    % ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
-    % set(gcf, 'Color', 'w'); axis tight;
-   
+    set(gca, 'GridLineStyle', '-'); set(gca, 'GridAlpha', 0.3); set(gca, 'LineWidth', 1);
+    ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
+    set(gcf, 'Color', 'w'); axis tight;
+
+    if f.isKey("xlim")
+        xlim(f("xlim"));
+    end
+
+
     if f.isKey("ylim")
         ylim(f("ylim"));
     end
 
+    view(25, 60);
     print("figs/" + f("figure_name") + ".eps",'-depsc','-painters','-r300');
     savefig("figs/" + f("figure_name") + ".fig");
 end

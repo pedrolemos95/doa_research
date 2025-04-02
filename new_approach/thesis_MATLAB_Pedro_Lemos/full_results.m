@@ -197,25 +197,63 @@ create_figure(f);
 M_f = 10; % frequencies
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
-num_observations = 100;
+K_threshold = 2;
+num_observations = 200;
 angle_of_arrival = (pi/180)*[60;20]; % [elevation, azimuth]
 % Simulation setup END %
 
 % Simulation block BEGIN %
-K_high = 4;
-K_threshold = 1;
+K_high = 3;
 results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
-unclass_estimated_pos = results("unclass_estimated_pos");
-class_estimated_pos = results("unclass_estimated_pos");
-tx_pos = results("tx_pos");
+unclass_estimated_pos_high_k = results("unclass_estimated_pos");
+class_estimated_pos_high_k = results("class_estimated_pos");
+tx_pos = results("tx_pos")+[0;0;0.15];% sum 0.15 in z to put it slightly above other positions
 rx_pos = results("rx_pos");
 
+K_low = 0.2;
+results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
+unclass_estimated_pos_low_k = results("unclass_estimated_pos");
+class_estimated_pos_low_k = results("class_estimated_pos");
+
+unclass_estimated_pos = [unclass_estimated_pos_high_k, unclass_estimated_pos_low_k];
+class_estimated_pos = [class_estimated_pos_high_k, class_estimated_pos_low_k] + [0;0;0.1]; % sum 0.1 in z to put it slightly above other positions
+
+% f = containers.Map();
+% f("figure_name") = "simulation_5_1";
+% f("graphs") = {unclass_estimated_pos, class_estimated_pos, rx_pos, tx_pos};
+% f("legends") = {"Without classification", "With classification", "Locator Position", "Real Position"};
+% f("markerssize") = {50,50,300,50};
+% f("xlabel") = "$X$";
+% f("ylabel") = "$Y$";
+% f("xlim") = [0 3];
+% f("ylim") = [-1 3];
+% create_3d_figure(f);
+
+% Generate the cdf for the position error
+unclass_x = unclass_estimated_pos(1,:);
+unclass_y = unclass_estimated_pos(2,:);
+class_x = class_estimated_pos(1,:);
+class_y = class_estimated_pos(2,:);
+error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
+error_class = sqrt(sum(([class_x; class_y] - tx_pos(1:2)).^2));
+
+% h = cdfplot(error_unclass); set(h, 'LineWidth', 2); title('');
+% graph_1.y_data = h.YData;
+% graph_1.x_data = h.XData;
+[y_data, x_data] = ecdf(error_unclass);
+graph_1.y_data = y_data;
+graph_1.x_data = x_data;
+
+[y_data, x_data] = ecdf(error_class);
+graph_2.y_data = y_data;
+graph_2.x_data = x_data;
+
 f = containers.Map();
-f("figure_name") = "simulation_5";
-f("graphs") = {unclass_estimated_pos};
-f("xlabel") = "$X$";
-f("ylabel") = "$Y$";
-f("ylim") = [0 2];
-create_3d_figure(f);
+f("figure_name") = "simulation_5_2";
+f("graphs") = {graph_1, graph_2};
+f("legends") = {"Without classification", "With classification", "Locator Position"};
+f("xlabel") = "Position error (m)";
+f("ylabel") = "$P(X < x)$";
+create_figure(f);
 
 %% Simulation X: AoA and position estimation error dependency on AoA elevation

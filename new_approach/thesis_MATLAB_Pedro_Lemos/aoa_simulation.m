@@ -64,13 +64,10 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     % unclassified estimates
     pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_estimate, 'UniformOutput', false);
     unclass_pos_estimates = [pos_estimates{:}];
-    % unclass_x = pos_vec(1,:); unclass_y = pos_vec(2,:);
     
     % classified estimates
     pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est_class, 'UniformOutput', false);
     class_pos_estimates = [pos_estimates{:}];
-    % class_x = pos_vec(1,:); class_y = pos_vec(2,:);
-    % scatter3(class_x, class_y, tx_height*ones(size(class_x))+0.1, 'filled');
 
     %% Export results
     results = containers.Map();
