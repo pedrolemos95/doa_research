@@ -1,0 +1,15 @@
+0. Arrumar o quarto #ok#
+1. Finalizar revisão da seção II #OK#
+2. Finalizar a revisão do artigo. Fazer todas as figuras alteráveis.
+3. Incluir os últimos resultados do Richard
+3. Organizar o repositório e incluir um README para que eles possam usar o script. Testar mais a simulação.
+4. Simular do jeito certo (correlação entre antenas)
+5. Refazer os resultados para a nova forma de Simular
+6. Comentário breve sobre como as observações da simulação são geradas
+7. Renomear as imagens no artigo para deixar organizado e incluir todos os arquivos fonte das imagens.
+
+As coisas princpais a se fazer:
+1. Uma única simulação que reúne todos os resultados e pode ser facilmente usada e alterada.
+2. Organização das imagens no Latex
+3. Simulação do canal com correlação entre antenas
+

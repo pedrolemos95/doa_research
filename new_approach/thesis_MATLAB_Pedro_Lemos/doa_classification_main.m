@@ -20,7 +20,7 @@ dimensions = [M_1; M_2; M_3];
 % 200 observations
 num_observations = 300; 
 
-K_high = 4;
+K_high = 2;
 weight = sqrt(K_high/(K_high+1)); % [W^(0.5)]
 sig_rayleigh = 1/(K_high+1); % [W]
 
@@ -118,20 +118,23 @@ rx_pos = [0;0;rp.height];
 rx_height = rp.height;
 tx_height = 1.0;
 dz = rx_height - tx_height;
+tx_pos = dz*[cot(elevations)*cos(azimuths); cot(elevations)*sin(azimuths)];
+
 pos_estimate_fun = @(mu) real(rx_pos + [0;0;tx_height - rx_height] + (dz/(k*sqrt(1 - (mu(2)^2 + mu(3)^2)/k^2)))*[mu(2);mu(3);0]);
 
 % raw estimates
 pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est, 'UniformOutput', false);
 pos_vec = [pos_estimates{:}];
-vec_x = pos_vec(1,:); vec_y = pos_vec(2,:);
+unclass_x = pos_vec(1,:); unclass_y = pos_vec(2,:);
 
-scatter(vec_x, vec_y, 'filled');
+scatter3(unclass_x, unclass_y, tx_height*ones(size(unclass_x)), 'filled');
 hold on;
-% classified estimates
 
+% classified estimates
 pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est_class, 'UniformOutput', false);
 pos_vec = [pos_estimates{:}];
-scatter(pos_vec(1,:), pos_vec(2,:), 'filled');
+class_x = pos_vec(1,:); class_y = pos_vec(2,:);
+scatter3(class_x, class_y, tx_height*ones(size(class_x))+0.1, 'filled');
 
 tx_x = mean(pos_vec(1,:));
 tx_y = mean(pos_vec(2,:));
@@ -144,17 +147,18 @@ grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
 
 set(gcf, 'Color', 'w'); axis tight;
 
-ylim([-5,5]);
-xlim([-5,5]);
-
-h = scatter(0,0,'filled'); % Locator position
+ylim([-1,3]);
+xlim([0,3]);
+zlim([0, rx_height]);
+h = scatter3(0,0,rx_height,'filled'); % Locator position
 h.SizeData = 300;
-scatter(tx_x,tx_y,'filled'); % transmitter position
+scatter3(tx_pos(1),tx_pos(2), tx_height+0.15, 'filled'); % transmitter position
 h.SizeData = 300;
 
 % Legend
-legend({'With classification', 'Without classification', 'Locator Position', 'Real Position'}, ...
+legend({'Without classification', 'With classification', 'Locator Position', 'Real Position'}, ...
        'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
+view(25, 60);
 print('figs/position_example','-depsc','-painters','-r300');
 %% Write results to "output" folder as csv files
 unclassified_dir_errors_file = "output/dir_errors_before_CL"+ ".csv";
@@ -165,6 +169,30 @@ writematrix(dir_errors, unclassified_dir_errors_file);
 writematrix(dir_errors_cleaned, classified_dir_errors_file);
 writematrix(est_k, estimated_ks_file);
 
+%% Estimate the position error cdf
+
+hold off;
+figure
+hold off; hold on;
+error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos).^2));
+error_unclass = error_unclass(error_unclass < 15);
+error_class = sqrt(sum(([class_x; class_y] - tx_pos).^2));
+
+h = cdfplot(error_unclass); set(h, 'LineWidth', 2); title('');
+h = cdfplot(error_class); set(h, 'LineWidth', 2); title('');
+
+% Grid and axis styles
+grid on; ax = gca; ax.FontSize = 10; ax.LineWidth = 1.2; ax.Box = 'on';
+
+ylabel('P(X < x)', 'FontSize', 12);
+xlabel('Position error (m)', 'FontSize', 12);
+
+% Legend
+legend({'Without Classification', 'With Classification'}, ...
+       'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
+
+set(gcf, 'Color', 'w'); axis tight;
+print('figs/pos_error_cdf','-depsc','-painters','-r300');
 %% Generate figures
 
 % % K estimate figure

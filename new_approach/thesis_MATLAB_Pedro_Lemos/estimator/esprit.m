@@ -23,7 +23,7 @@ function [parameters, weight, nlos_power] = esprit(varargin)
 
     % selection matrices...
     Js1_1 = kron(kron(eye(M3), eye(M2)), [eye(M1-1) zeros(M1-1,1)]);
-    Js1_2 = kron(kron(eye(M3), [eye(M2-1) zeros(M2-1,1)]), eye(M1));
+    Js1_2 = kron(kron(eye(M3), [zeros(M2-1,1) eye(M2-1)]), eye(M1));
     Js1_3 = kron(kron([eye(M3-1) zeros(M3-1,1)], eye(M2)), eye(M1));
 
     Js2_1 = kron(kron(eye(M3), eye(M2)), [zeros(M1-1,1) eye(M1-1)]);

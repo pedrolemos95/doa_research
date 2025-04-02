@@ -1,9 +1,101 @@
+Corrigir a estimativa de posição
+    Basta estimar a posição e isso bater com a média
+
+Montar uma abstração que me permita testar diferentes condições de canal e abertura mais facilmente
+    Definição de entrada
+        K_high, K_low, F, N, n_obs #ok#
+    Definição de saída
+        Results - Estrutura semelhante a um dict?
+            doas_errors_cdf_uncl
+            doas_errors_cdf_class
+            est_ks
+            positions            
+
 Refazer mais algumas pendências do paper
 
-Commitar no git de novo
-
 Fazer as imagens que o Richard solicitou
+
+    Imagem de posicionamento #ok#
+
+    1) Figuras com realização da estimativa do K (1,4), para sets de F (4,16,64) vs N=16 e sets de N (4,16,64) vs F=16. #ok#
+        Esse resultado faz sentido?
+
+    2) Mesmo análise, mas média, não da realização, para diferentes K. #ok#
+    
+    3) Análise do erro médio de AoA em função do threshold escolhido.
+    Para complementar, mostrar quantos % das amostras de AoA são rejeitadas para cada valor de threshold.
+    Considerar conjuntos de parâmetros compatíveis com as figuras anteriores.
+        How does it behave when using K=0.5 and K=4. 200 samples per obs.
+            Output:
+            CDF graph for the K_threshold output?
+            Mean doa error for threshold K_thr;
+            % of samples discarded for each case.
+            graph of mean doa error vs samples used.
+        Now, the same thing but with multiple K, ranging from K=0.25 to 5, 20 samples per obs, 0.25 step and
+        
+        What i need to generate?
+        results from multiple K, only that
+        How to process it:
+            mean doa_error for classified measurements
+
+    4) Exemplo prático de localização, com erro em metros, ilustrando o impacto do método.
+    Considerar conjuntos de parâmetros compatíveis com as figuras anteriores.
+
+    5) Figura de posicionamento 3D
+
+    6) Todas as figuras também exportadas como .fig
+
+    Outro ponto que eu acho que devemos discutir é considerar só K=1 e K=4. O caso K=1 tem uma LoS razoável ainda, enquanto K=4 tem uma LoS forte.
+    Que tal considerar também um caso com mais multipath, como K=0.5, e caso com menos LoS no K bom, como K=2?
+    Além disso, podes até variar (no exemplo de localização ou na análise 3 acima) o % do tempo que o setup fica em LoS fraca.
+
+Pensar numa abstração melhor para o código do MATLAB. Algo que contemple todas as situações que desejo visualizar.
+Existe algum modelo de dados que me ajudaria nesse sentido?
+Alguma inspiração em bancos de dados relacionais?
+Quais são os dados "onipresents" e que "combinações" deles me são úteis?
+Qual exatamente é o meu problema "operacional" ao gerar figuras?
 
 Trabalhar no modelo do canal?
 
 Viabilidade de montar um experimento com duas antenas
+
+
+############## TODO ################
+
+Finalizar as pendências do artigo #ok#
+    Especialmente o modelo do canal
+        Equação com o steering vector. #ok#
+        Equação com o vetor das frequências. #ok#
+        Equação com a transformação de \Phi para \Psi #Ok#
+
+
+Aplicar as figuras restantes
+    Verificar todas as figuras.
+    Figura final?
+
+Comentar melhor as últimas figuras
+
+Adicionar um diagrama de blocos do método: Não
+
+##### TODO ####
+Comentar o exemplo de posição 3d
+    A figura pode melhorar #ok#
+    Falta a CDF do erro
+Adicionar a imagem principal!
+Resolver a figura zuada lá na matriz
+
+
+### Dúvida Glauber ###
+1. Dúvida 1:
+    1. corrigir dimensão, de fato está errado. #ok#
+    2. de repente é até melhor refazer o steering vector. #ok#
+    3. preciso entender de novo o vetor a_f
+    4. sim, é melhor definir a pdf da amplitude do sinal logo após (2)) #ok#
+    5. remover a parte que fala sobre a correlação? (não preciso dizer como o sinal foi simulado)
+    6. correção do typo da matriz
+
+Refazer a imagem do erro médio em função de K?
+
+Assunto principal:
+    correlação espacial
+
