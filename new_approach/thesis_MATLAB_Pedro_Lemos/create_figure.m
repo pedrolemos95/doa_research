@@ -62,6 +62,10 @@ function create_figure(f)
         set(lgd, 'EdgeColor', [0.6 0.6 0.6]);
     end
 
+    if f.isKey("tabletext")
+        text(2.2, 4, f("tabletext"), 'FontSize', 12, 'BackgroundColor', 'w', 'EdgeColor', 'k', 'Margin', 5);
+    end
+
     % Grid and axis styles
     ax = gca;
     grid on;

@@ -10,17 +10,18 @@ M_f = 10; % frequencies
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
 num_observations = 100;
+angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 % Simulation setup END %
 
 % Simulation block BEGIN %
 K_high = 4;
 K_threshold = 1; % Doesn't matter in this simulation
-results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_high = results("est_ks");
 
 K_low = 1;
 K_threshold = 1; % Doesn't matter in this simulation
-results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_low = results("est_ks");
 % Simulation block END %
 
@@ -45,6 +46,7 @@ create_figure(f);
 % Simulation setup BEGIN %
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
+angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 num_observations = 100;
 K_high = 4;
 K_low = 1;
@@ -55,28 +57,28 @@ K_threshold = 1; % Doesn't matter in this simulation
 
 % 4 frequencies
 M_f = 4;
-results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_high = results("est_ks");
 
-results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_low = results("est_ks");
 graph_1.y_data = [est_ks_high; est_ks_low];
 
 % 16 frequencies
 M_f = 16;
-results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_high = results("est_ks");
 
-results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_low = results("est_ks");
 graph_2.y_data = [est_ks_high; est_ks_low];
 
 % 64 frequencies
 M_f = 64;
-results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_high = results("est_ks");
 
-results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
+results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 est_ks_low = results("est_ks");
 graph_3.y_data = [est_ks_high; est_ks_low];
 
@@ -101,6 +103,7 @@ create_figure(f);
 % Simulation setup BEGIN %
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
+angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 num_observations = 500;
 K_sweep = 0.5:0.5:10; % The values of K in which we calculate the mean K estimate
 K_threshold = 1; % Doesn't matter in this simulation
@@ -111,7 +114,7 @@ K_threshold = 1; % Doesn't matter in this simulation
 M_f = 4;
 mean_ks = zeros(numel(K_sweep),1);
 for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
        mean_ks(index) = mean(results("est_ks"));
 end
 graph_1.y_data = mean_ks;
@@ -121,7 +124,7 @@ graph_1.x_data = K_sweep;
 M_f = 16;
 mean_ks = zeros(numel(K_sweep),1);
 for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
        mean_ks(index) = mean(results("est_ks"));
 end
 graph_2.y_data = mean_ks;
@@ -131,7 +134,7 @@ graph_2.x_data = K_sweep;
 M_f = 64;
 mean_ks = zeros(numel(K_sweep),1);
 for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
        mean_ks(index) = mean(results("est_ks"));
 end
 graph_3.y_data = mean_ks;
@@ -154,12 +157,13 @@ f("markersfacecolors") = {'b','none','none'};
 create_figure(f);
 % Result analysis and export END %
 
-%% Simulation 4: Mean AoA error dependency on K threshold
+%% Simulation 4: Mean AoA error dependency on K
 % Simulation setup BEGIN %
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
+angle_of_arrival = (pi/180)*[-90;0]; % [elevation, azimuth]
 num_observations = 100; % The number of observations per channel condition (K)
-K_sweep = 0.1:0.1:10; % The values of K in which we want the channel to assume
+K_sweep = 0.1:0.1:5; % The values of K in which we want the channel to assume
 K_threshold = K_sweep; % The values of threholds with which we want to classify the estimates
 % Simulation setup END %
 
@@ -168,7 +172,7 @@ K_threshold = K_sweep; % The values of threholds with which we want to classify 
 M_f = 16;
 mean_aoa_error = zeros(numel(K_sweep),1);
 for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), 1, [M_f;M_1;M_2], num_observations);
+       results = aoa_simulation(K_sweep(index), 1, [M_f;M_1;M_2], num_observations, angle_of_arrival);
        % Calculate aoa error
        mean_aoa_error(index) = mean(results("unclass_doa_error"));
 end
@@ -183,8 +187,9 @@ f = containers.Map();
 f("figure_name") = "simulation_4";
 f("graphs") = {graph_1};
 f("xlabel") = "$K$";
-f("ylabel") = "Mean AoA Error (º)";
+f("ylabel") = "Mean AoA Error";
+f("tabletext") = sprintf('Elevation = %d (º)\nAzimuth = %d (º)\n', ceil((180/pi)*angle_of_arrival(1)), ceil((180/pi)*angle_of_arrival(2)));
 create_figure(f);
 % Result analysis and export END %
 
-%% Simulation X: AoA estimation error dependency on AoA elevation
+%% Simulation X: AoA and position estimation error dependency on AoA elevation

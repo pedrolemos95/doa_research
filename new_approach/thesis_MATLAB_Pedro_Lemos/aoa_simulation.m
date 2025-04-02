@@ -1,9 +1,11 @@
-function results = aoa_simulation(K_high, K_threshold, dimensions, num_observations)
+function results = aoa_simulation(K_high, K_threshold, dimensions, num_observations, angle_of_arrival)
     %% Simulate channel with different rice factors (K) and same SNR
     % physical parameters
     delays = 10*1e-9;
-    elevations = 60*(pi/180);
-    azimuths = 20*(pi/180);
+    elevations = angle_of_arrival(1);
+    azimuths = angle_of_arrival(2);
+    % elevations = 60*(pi/180);
+    % azimuths = 20*(pi/180);
 
     % Aperture dimensions
     M_1 = dimensions(1); % frequency related
