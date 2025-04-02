@@ -146,7 +146,7 @@ f("figure_name") = "simulation_3";
 f("graphs") = {graph_1, graph_2, graph_3};
 f("legends") = {'$$M_f=4$$', '$$M_f=16$$', '$$M_f=64$$'};
 f("ylim") = [0 15];
-f("xlabel") = "K";
+f("xlabel") = "$K$";
 f("ylabel") = "$\hat{K}$";
 f("linestyles") = {'-', '--', '-'};
 f("markers") = {'o','none','none'};
@@ -158,56 +158,32 @@ create_figure(f);
 % Simulation setup BEGIN %
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
-num_observations = 500; % The number of observations per channel condition (K)
-K_sweep = 0.5:0.5:10; % The values of K in which we want the channel to assume
-K_threshold = 1; % The values of threholds with which we want to classify the estimates
+num_observations = 100; % The number of observations per channel condition (K)
+K_sweep = 0.1:0.1:10; % The values of K in which we want the channel to assume
+K_threshold = K_sweep; % The values of threholds with which we want to classify the estimates
 % Simulation setup END %
 
 % Simulation block BEGIN %
-% 4 frequencies
-M_f = 4;
-mean_ks = zeros(numel(K_sweep),1);
-for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
-       mean_ks(index) = mean(results("est_ks"));
-end
-graph_1.y_data = mean_ks;
-graph_1.x_data = K_sweep;
-
 % 16 frequencies
 M_f = 16;
-mean_ks = zeros(numel(K_sweep),1);
+mean_aoa_error = zeros(numel(K_sweep),1);
 for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
-       mean_ks(index) = mean(results("est_ks"));
+       results = aoa_simulation(K_sweep(index), 1, [M_f;M_1;M_2], num_observations);
+       % Calculate aoa error
+       mean_aoa_error(index) = mean(results("unclass_doa_error"));
 end
-graph_2.y_data = mean_ks;
-graph_2.x_data = K_sweep;
-
-% 64 frequencies
-M_f = 64;
-mean_ks = zeros(numel(K_sweep),1);
-for index = 1:numel(K_sweep)
-       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
-       mean_ks(index) = mean(results("est_ks"));
-end
-graph_3.y_data = mean_ks;
-graph_3.x_data = K_sweep;
+graph_1.y_data = mean_aoa_error;
+graph_1.x_data = K_sweep;
 
 % Simulation block END %
 
 % Result analysis and export BEGIN %
 
 f = containers.Map();
-f("figure_name") = "simulation_3";
-f("graphs") = {graph_1, graph_2, graph_3};
-f("legends") = {'$$M_f=4$$', '$$M_f=16$$', '$$M_f=64$$'};
-f("ylim") = [0 15];
-f("xlabel") = "K";
-f("ylabel") = "$\hat{K}$";
-f("linestyles") = {'-', '--', '-'};
-f("markers") = {'o','none','none'};
-f("markersfacecolors") = {'b','none','none'};
+f("figure_name") = "simulation_4";
+f("graphs") = {graph_1};
+f("xlabel") = "$K$";
+f("ylabel") = "Mean AoA Error (º)";
 create_figure(f);
 % Result analysis and export END %
 

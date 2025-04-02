@@ -48,14 +48,15 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     directions = cellfun(@(param) dir_fun(param), los_estimate, 'UniformOutput', false);
     dir_errors = arrayfun(@(n) (180/pi)*real(acos(directions{n}.'*real_dir/(norm(directions{n})*norm(real_dir)))), 1:num_observations).'; % AoA error definition
 
+
     %% Classification step. Eliminate measurements based on K estimate and some arbitrary threshold. How much do we miss?
     dir_errors_classified = dir_errors(estimated_ks > K_threshold);
     los_est_class = los_estimate(estimated_ks > K_threshold);
 
     %% Export results
     results = containers.Map();
-    results("unclass_dir_error") = dir_errors;
-    results("class_dir_error") = dir_errors_classified;
+    results("unclass_doa_error") = dir_errors;
+    results("class_doa_error") = dir_errors_classified;
     results("los_ests") = los_estimate;
     results("est_ks") = estimated_ks;
     results("los_est_class") = los_est_class;
