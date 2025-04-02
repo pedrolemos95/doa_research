@@ -192,4 +192,30 @@ f("tabletext") = sprintf('Elevation = %d (º)\nAzimuth = %d (º)\n', ceil((180/p
 create_figure(f);
 % Result analysis and export END %
 
+%% Simulation 5: Positioning demo
+% Simulation setup BEGIN %
+M_f = 10; % frequencies
+M_1 = 4; % rows in the antenna array
+M_2 = 4; % columns in the antenna array
+num_observations = 100;
+angle_of_arrival = (pi/180)*[60;20]; % [elevation, azimuth]
+% Simulation setup END %
+
+% Simulation block BEGIN %
+K_high = 4;
+K_threshold = 1;
+results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
+unclass_estimated_pos = results("unclass_estimated_pos");
+class_estimated_pos = results("unclass_estimated_pos");
+tx_pos = results("tx_pos");
+rx_pos = results("rx_pos");
+
+f = containers.Map();
+f("figure_name") = "simulation_5";
+f("graphs") = {unclass_estimated_pos};
+f("xlabel") = "$X$";
+f("ylabel") = "$Y$";
+f("ylim") = [0 2];
+create_3d_figure(f);
+
 %% Simulation X: AoA and position estimation error dependency on AoA elevation

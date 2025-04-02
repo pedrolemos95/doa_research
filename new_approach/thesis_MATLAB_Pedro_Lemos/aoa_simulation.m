@@ -4,8 +4,6 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     delays = 10*1e-9;
     elevations = angle_of_arrival(1);
     azimuths = angle_of_arrival(2);
-    % elevations = 60*(pi/180);
-    % azimuths = 20*(pi/180);
 
     % Aperture dimensions
     M_1 = dimensions(1); % frequency related
@@ -50,10 +48,29 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     directions = cellfun(@(param) dir_fun(param), los_estimate, 'UniformOutput', false);
     dir_errors = arrayfun(@(n) (180/pi)*real(acos(directions{n}.'*real_dir/(norm(directions{n})*norm(real_dir)))), 1:num_observations).'; % AoA error definition
 
-
     %% Classification step. Eliminate measurements based on K estimate and some arbitrary threshold. How much do we miss?
     dir_errors_classified = dir_errors(estimated_ks > K_threshold);
     los_est_class = los_estimate(estimated_ks > K_threshold);
+
+    %% Estimate position using a single locator (assuming height = 1m)
+    rx_pos = [0;0;rp.height];
+    rx_height = rp.height;
+    tx_height = 1.0;
+    dz = rx_height - tx_height;
+    tx_pos = dz*[cot(elevations)*cos(azimuths); cot(elevations)*sin(azimuths); 0] + [0; 0; tx_height];
+    
+    pos_estimate_fun = @(mu) real(rx_pos + [0;0;tx_height - rx_height] + (dz/(k*sqrt(1 - (mu(2)^2 + mu(3)^2)/k^2)))*[mu(2);mu(3);0]);
+    
+    % unclassified estimates
+    pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_estimate, 'UniformOutput', false);
+    unclass_pos_estimates = [pos_estimates{:}];
+    % unclass_x = pos_vec(1,:); unclass_y = pos_vec(2,:);
+    
+    % classified estimates
+    pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_est_class, 'UniformOutput', false);
+    class_pos_estimates = [pos_estimates{:}];
+    % class_x = pos_vec(1,:); class_y = pos_vec(2,:);
+    % scatter3(class_x, class_y, tx_height*ones(size(class_x))+0.1, 'filled');
 
     %% Export results
     results = containers.Map();
@@ -63,4 +80,8 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     results("est_ks") = estimated_ks;
     results("los_est_class") = los_est_class;
     results("sample_discard_ratio") = numel(los_est_class)/numel(los_estimate);
+    results("unclass_estimated_pos") = unclass_pos_estimates;
+    results("class_estimated_pos") = class_pos_estimates;
+    results("tx_pos") = tx_pos;
+    results("rx_pos") = rx_pos;
 end
