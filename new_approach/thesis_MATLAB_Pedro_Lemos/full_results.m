@@ -25,8 +25,10 @@ est_ks_low = results("est_ks");
 % Simulation block END %
 
 % Result analysis and export BEGIN %
-real_ks = [K_high*ones(num_observations,1); K_low*ones(num_observations,1)];
-estimated_ks = [est_ks_high; est_ks_low];
+real_ks.y_data = [K_high*ones(num_observations,1); K_low*ones(num_observations,1)];
+estimated_ks.y_data = [est_ks_high; est_ks_low];
+graph_1.y_data = real_ks;
+graph_2.y_data = estimated_ks;
 
 f = containers.Map();
 f("figure_name") = "simulation_1";
@@ -58,7 +60,7 @@ est_ks_high = results("est_ks");
 
 results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
 est_ks_low = results("est_ks");
-graph_1 = [est_ks_high; est_ks_low];
+graph_1.y_data = [est_ks_high; est_ks_low];
 
 % 16 frequencies
 M_f = 16;
@@ -67,7 +69,7 @@ est_ks_high = results("est_ks");
 
 results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
 est_ks_low = results("est_ks");
-graph_2 = [est_ks_high; est_ks_low];
+graph_2.y_data = [est_ks_high; est_ks_low];
 
 % 64 frequencies
 M_f = 64;
@@ -76,9 +78,9 @@ est_ks_high = results("est_ks");
 
 results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations);
 est_ks_low = results("est_ks");
-graph_3 = [est_ks_high; est_ks_low];
+graph_3.y_data = [est_ks_high; est_ks_low];
 
-real_ks = [K_high*ones(num_observations,1); K_low*ones(num_observations,1)];
+real_ks.y_data = [K_high*ones(num_observations,1); K_low*ones(num_observations,1)];
 
 % Simulation block END %
 
@@ -100,7 +102,7 @@ create_figure(f);
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
 num_observations = 500;
-K_sweep = 0.5:0.1:10; % The values of K in which we calculate the mean K estimate
+K_sweep = 0.5:0.5:10; % The values of K in which we calculate the mean K estimate
 K_threshold = 1; % Doesn't matter in this simulation
 % Simulation setup END %
 
@@ -112,7 +114,8 @@ for index = 1:numel(K_sweep)
        results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
        mean_ks(index) = mean(results("est_ks"));
 end
-graph_1 = mean_ks;
+graph_1.y_data = mean_ks;
+graph_1.x_data = K_sweep;
 
 % 16 frequencies
 M_f = 16;
@@ -121,7 +124,8 @@ for index = 1:numel(K_sweep)
        results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
        mean_ks(index) = mean(results("est_ks"));
 end
-graph_2 = mean_ks;
+graph_2.y_data = mean_ks;
+graph_2.x_data = K_sweep;
 
 % 64 frequencies
 M_f = 64;
@@ -130,7 +134,8 @@ for index = 1:numel(K_sweep)
        results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
        mean_ks(index) = mean(results("est_ks"));
 end
-graph_3 = mean_ks;
+graph_3.y_data = mean_ks;
+graph_3.x_data = K_sweep;
 
 % Simulation block END %
 
@@ -141,14 +146,69 @@ f("figure_name") = "simulation_3";
 f("graphs") = {graph_1, graph_2, graph_3};
 f("legends") = {'$$M_f=4$$', '$$M_f=16$$', '$$M_f=64$$'};
 f("ylim") = [0 15];
-f("xlabel") = "Sample";
+f("xlabel") = "K";
 f("ylabel") = "$\hat{K}$";
 f("linestyles") = {'-', '--', '-'};
 f("markers") = {'o','none','none'};
-f("markersfacecolors") = {'r','none','none'};
+f("markersfacecolors") = {'b','none','none'};
 create_figure(f);
 % Result analysis and export END %
 
 %% Simulation 4: Mean AoA error dependency on K threshold
+% Simulation setup BEGIN %
+M_1 = 4; % rows in the antenna array
+M_2 = 4; % columns in the antenna array
+num_observations = 500; % The number of observations per channel condition (K)
+K_sweep = 0.5:0.5:10; % The values of K in which we want the channel to assume
+K_threshold = 1; % The values of threholds with which we want to classify the estimates
+% Simulation setup END %
+
+% Simulation block BEGIN %
+% 4 frequencies
+M_f = 4;
+mean_ks = zeros(numel(K_sweep),1);
+for index = 1:numel(K_sweep)
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       mean_ks(index) = mean(results("est_ks"));
+end
+graph_1.y_data = mean_ks;
+graph_1.x_data = K_sweep;
+
+% 16 frequencies
+M_f = 16;
+mean_ks = zeros(numel(K_sweep),1);
+for index = 1:numel(K_sweep)
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       mean_ks(index) = mean(results("est_ks"));
+end
+graph_2.y_data = mean_ks;
+graph_2.x_data = K_sweep;
+
+% 64 frequencies
+M_f = 64;
+mean_ks = zeros(numel(K_sweep),1);
+for index = 1:numel(K_sweep)
+       results = aoa_simulation(K_sweep(index), K_threshold, [M_f;M_1;M_2], num_observations);
+       mean_ks(index) = mean(results("est_ks"));
+end
+graph_3.y_data = mean_ks;
+graph_3.x_data = K_sweep;
+
+% Simulation block END %
+
+% Result analysis and export BEGIN %
+
+f = containers.Map();
+f("figure_name") = "simulation_3";
+f("graphs") = {graph_1, graph_2, graph_3};
+f("legends") = {'$$M_f=4$$', '$$M_f=16$$', '$$M_f=64$$'};
+f("ylim") = [0 15];
+f("xlabel") = "K";
+f("ylabel") = "$\hat{K}$";
+f("linestyles") = {'-', '--', '-'};
+f("markers") = {'o','none','none'};
+f("markersfacecolors") = {'b','none','none'};
+create_figure(f);
+% Result analysis and export END %
 
 %% Simulation X: AoA estimation error dependency on AoA elevation

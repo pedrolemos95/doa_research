@@ -6,7 +6,14 @@ function create_figure(f)
     graphs = f("graphs");
     handlers = cell([numel(graphs) 1]);
     for graph_idx = 1:numel(graphs)
-        handlers{graph_idx} = plot(graphs{graph_idx}, "LineWidth", 2);
+        graph = graphs{graph_idx};
+        y_data = graph.y_data;
+        if (isfield(graph, 'x_data'))
+            x_data = graph.x_data;
+            handlers{graph_idx} = plot(x_data, y_data, "LineWidth", 2);
+        else
+            handlers{graph_idx} = plot(y_data, "LineWidth", 2);
+        end
     end
 
     if f.isKey("markers")
