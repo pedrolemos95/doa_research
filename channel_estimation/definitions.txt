@@ -1,5 +1,0 @@
-1. The nonlinear parameters vector is always represented by: |mi> = [|mi_1> ; |mi_2> ; |mi_3>]
-2. The weights by |gamma> = [|gamma_r> ; |gamma_i>]
-3. The full parameters vectors is represented by |theta> = [|mi> ; |gamma>]
-4. The estimation algorithm always input and output parameters are always normalized
-5. The mapping between the physical and normalized parameters is arbitrary but is made in only one file

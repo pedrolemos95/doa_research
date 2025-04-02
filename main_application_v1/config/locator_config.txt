@@ -1,3 +1,0 @@
-version: 1.1
-Locator number  |   COM port    |   IP address  |   pos_x   |   pos_y   |   pos_z   |   rot_x   |   rot_y   |   rot_z    |  az_min  |   az_max
-1                 /dev/ttyACM0           -           4.9        -6.2         2.9         180.0         0.0         0.0     -180.0       -180.0
