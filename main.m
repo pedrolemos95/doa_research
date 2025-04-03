@@ -199,18 +199,18 @@ M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
 K_threshold = 2;
 num_observations = 200;
-angle_of_arrival = (pi/180)*[60;20]; % [elevation, azimuth]
+angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 % Simulation setup END %
 
 % Simulation block BEGIN %
-K_high = 3;
+K_high = 4;
 results = aoa_simulation(K_high, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 unclass_estimated_pos_high_k = results("unclass_estimated_pos");
 class_estimated_pos_high_k = results("class_estimated_pos");
 tx_pos = results("tx_pos")+[0;0;0.15];% sum 0.15 in z to put it slightly above other positions
 rx_pos = results("rx_pos");
 
-K_low = 0.2;
+K_low = 0.1;
 results = aoa_simulation(K_low, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
 unclass_estimated_pos_low_k = results("unclass_estimated_pos");
 class_estimated_pos_low_k = results("class_estimated_pos");
@@ -222,11 +222,12 @@ f = containers.Map();
 f("figure_name") = "simulation_5_1";
 f("graphs") = {unclass_estimated_pos, class_estimated_pos, rx_pos, tx_pos};
 f("legends") = {"Without classification", "With classification", "Locator Position", "Real Position"};
-f("markerssize") = {50,50,300,50};
+% f("markerssize") = {50,50,300,50};
+f("xlim") = [0 5];
+f("ylim") = [-5 5];
 f("xlabel") = "$X$";
 f("ylabel") = "$Y$";
-f("xlim") = [0 3];
-f("ylim") = [-1 3];
+f("markers") = {'*', '*', 'o', 'o'};
 create_3d_figure(f);
 
 % Generate the cdf for the position error

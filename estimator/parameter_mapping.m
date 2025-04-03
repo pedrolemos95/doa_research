@@ -26,8 +26,10 @@ function normalized_parameters = physical_to_normalized(physical_parameters)
 
     els = physical_parameters(P+1:2*P);
     azs = physical_parameters(2*P+1:3*P);
-    mu_2 = 2*pi*(rp.d/rp.lam)*cos(els).*cos(azs);
-    mu_3 = 2*pi*(rp.d/rp.lam)*cos(els).*sin(azs);
+    % mu_2 = 2*pi*(rp.d/rp.lam)*cos(els).*cos(azs);
+    mu_2 = 2*pi*(rp.d/rp.lam)*sin(els).*cos(azs);
+    % mu_3 = 2*pi*(rp.d/rp.lam)*cos(els).*sin(azs);
+    mu_3 = 2*pi*(rp.d/rp.lam)*sin(els).*sin(azs);
 
     normalized_parameters = [mu_1; mu_2; mu_3];
 end

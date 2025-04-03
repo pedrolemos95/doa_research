@@ -21,7 +21,6 @@ function create_3d_figure(f)
         end
     end
 
-
     if f.isKey("markerssize")
         markerssize = f("markerssize");
         for marker_idx = 1:numel(f("markerssize"))

@@ -19,8 +19,8 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     alpha = sqrt(desired_rssi/(weight^2 + sig_rayleigh));
     
     %% Generate observations based on the signal and channel model (Sec. II of paper)
-    parameters = parameter_mapping([delays;elevations;azimuths], "physical");
-    smc = specular_model(parameters, dimensions)*weight + wgn(M_1*M_2*M_3,1, measurement_noise_power, 'linear', 'complex');
+    los_parameters = parameter_mapping([delays;elevations;azimuths], "physical");
+    smc = specular_model(los_parameters, dimensions)*weight + wgn(M_1*M_2*M_3,1, measurement_noise_power, 'linear', 'complex');
     
     rssis_dbm = zeros(num_observations, 1);
     X = cell([num_observations 1]);
@@ -44,7 +44,7 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     rp = load_receiver_parameters;
     k = 2*pi*(rp.d/rp.lam);
     dir_fun = @(mu) (1/k)*[mu(2); mu(3); sqrt(k^2 - mu(2)^2 + mu(3)^2)];
-    real_dir = dir_fun(parameters);
+    real_dir = dir_fun(los_parameters);
     directions = cellfun(@(param) dir_fun(param), los_estimate, 'UniformOutput', false);
     dir_errors = arrayfun(@(n) (180/pi)*real(acos(directions{n}.'*real_dir/(norm(directions{n})*norm(real_dir)))), 1:num_observations).'; % AoA error definition
 
@@ -57,10 +57,10 @@ function results = aoa_simulation(K_high, K_threshold, dimensions, num_observati
     rx_height = rp.height;
     tx_height = 1.0;
     dz = rx_height - tx_height;
-    tx_pos = dz*[cot(elevations)*cos(azimuths); cot(elevations)*sin(azimuths); 0] + [0; 0; tx_height];
     
     pos_estimate_fun = @(mu) real(rx_pos + [0;0;tx_height - rx_height] + (dz/(k*sqrt(1 - (mu(2)^2 + mu(3)^2)/k^2)))*[mu(2);mu(3);0]);
     
+    tx_pos = pos_estimate_fun(los_parameters);
     % unclassified estimates
     pos_estimates = cellfun(@(parameter) pos_estimate_fun(parameter), los_estimate, 'UniformOutput', false);
     unclass_pos_estimates = [pos_estimates{:}];
