@@ -56,8 +56,15 @@ function create_figure(f)
         ylabel(f("ylabel"), 'FontSize', 12, 'Interpreter', 'latex');
     end
     
+    if f.isKey("legendsposition")
+        legends_position = f("legendsposition");
+    else
+        legends_position = 'northeast';
+    end
+
+
     if f.isKey("legends")
-        lgd = legend(f("legends"), 'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast');
+        lgd = legend(f("legends"), 'Interpreter', 'latex', 'FontSize', 10, 'Location', legends_position);
         set(lgd, 'Box', 'on');
         set(lgd, 'EdgeColor', [0.6 0.6 0.6]);
     end

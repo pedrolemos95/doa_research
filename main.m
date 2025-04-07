@@ -96,6 +96,9 @@ f("ylim") = [0 10];
 f("xlabel") = "Sample";
 f("ylabel") = "$\hat{K}$";
 f("linewidths") = {1,1,1,1};
+f("linestyles") = {'-', '--', '-', '-'};
+f("markers") = {'none', 'none', 'o', '+'};
+f("markersfacecolors") = {'r', 'r', 'y', 'r'};
 create_figure(f);
 % Result analysis and export END %
 
@@ -104,7 +107,7 @@ create_figure(f);
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
 angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
-num_observations = 500;
+num_observations = 1000;
 K_sweep = 0.5:0.5:10; % The values of K in which we calculate the mean K estimate
 K_threshold = 1; % Doesn't matter in this simulation
 % Simulation setup END %
@@ -147,7 +150,8 @@ graph_3.x_data = K_sweep;
 f = containers.Map();
 f("figure_name") = "simulation_3";
 f("graphs") = {graph_1, graph_2, graph_3};
-f("legends") = {'$$M_f=4$$', '$$M_f=16$$', '$$M_f=64$$'};
+f("legends") = {'$$F=4$$', '$$F=16$$', '$$F=64$$'};
+f("legendsposition") = {'northwest'};
 f("ylim") = [0 15];
 f("xlabel") = "$K$";
 f("ylabel") = "$\hat{K}$";
@@ -162,7 +166,7 @@ create_figure(f);
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
 angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
-num_observations = 400; % The number of observations per channel condition (K)
+num_observations = 500; % The number of observations per channel condition (K)
 K_sweep = 0.1:0.05:4; % The values of K in which we want the channel to assume
 K_threshold = K_sweep; % The values of threholds with which we want to classify the estimates
 % Simulation setup END %
@@ -187,8 +191,7 @@ f = containers.Map();
 f("figure_name") = "simulation_4";
 f("graphs") = {graph_1};
 f("xlabel") = "$K$";
-f("ylabel") = "Mean AoA Error";
-f("tabletext") = sprintf('Elevation = %d (º)\nAzimuth = %d (º)\n', ceil((180/pi)*angle_of_arrival(1)), ceil((180/pi)*angle_of_arrival(2)));
+f("ylabel") = "Mean AoA Error ($^\circ$)";
 create_figure(f);
 % Result analysis and export END %
 
