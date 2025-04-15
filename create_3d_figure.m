@@ -8,7 +8,7 @@ function create_3d_figure(f)
         x_data = graph(1,:);
         y_data = graph(2,:);
         z_data = graph(3,:);
-        handlers{graph_idx} = scatter3(x_data, y_data, z_data, 'filled');
+        handlers{graph_idx} = scatter3(x_data, y_data, z_data);
         hold on;
     end
     hold off;
@@ -16,7 +16,8 @@ function create_3d_figure(f)
     if f.isKey("markers")
         markers = f("markers");
         for marker_idx = 1:numel(f("markers"))
-            h = handlers{marker_idx}; 
+            h = handlers{marker_idx};
+            markers{marker_idx}
             h.Marker = markers{marker_idx};
         end
     end
@@ -32,7 +33,7 @@ function create_3d_figure(f)
     if f.isKey("markersfacecolors")
         markersfacecolors = f("markersfacecolors");
         for marker_idx = 1:numel(f("markersfacecolors"))
-            h = handlers{marker_idx}; 
+            h = handlers{marker_idx};
             h.MarkerFaceColor = markersfacecolors{marker_idx};
         end
     end

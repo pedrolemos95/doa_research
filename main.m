@@ -200,8 +200,8 @@ create_figure(f);
 M_f = 10; % frequencies
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
-K_threshold = 2;
-num_observations = 200;
+K_threshold = 1;
+num_observations = 1000;
 angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 % Simulation setup END %
 
@@ -223,74 +223,76 @@ class_estimated_pos = [class_estimated_pos_high_k, class_estimated_pos_low_k] + 
 
 f = containers.Map();
 f("figure_name") = "simulation_5_1";
-f("graphs") = {unclass_estimated_pos, class_estimated_pos, rx_pos, tx_pos};
-f("legends") = {"Without classification", "With classification", "Locator Position", "Real Position"};
-% f("markerssize") = {50,50,300,50};
+f("graphs") = {unclass_estimated_pos, class_estimated_pos, rx_pos};
+f("legends") = {"Without classification", "With classification", "Locator Position"};
+f("markerssize") = {50,50,300};
 f("xlim") = [0 5];
 f("ylim") = [-5 5];
 f("xlabel") = "$X$";
 f("ylabel") = "$Y$";
-f("markers") = {'*', '*', 'o', 'o'};
+f("markers") = {'+', 'd', 'o'};
+f("markersfacecolors") = {'none','none','y'};
 create_3d_figure(f);
 
 % Generate the cdf for the position error
-unclass_x = unclass_estimated_pos(1,:);
-unclass_y = unclass_estimated_pos(2,:);
-class_x = class_estimated_pos(1,:);
-class_y = class_estimated_pos(2,:);
-error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
-error_class = sqrt(sum(([class_x; class_y] - tx_pos(1:2)).^2));
-
-% h = cdfplot(error_unclass); set(h, 'LineWidth', 2); title('');
-% graph_1.y_data = h.YData;
-% graph_1.x_data = h.XData;
-[y_data, x_data] = ecdf(error_unclass);
-graph_1.y_data = y_data;
-graph_1.x_data = x_data;
-
-[y_data, x_data] = ecdf(error_class);
-graph_2.y_data = y_data;
-graph_2.x_data = x_data;
-
-f = containers.Map();
-f("figure_name") = "simulation_5_2";
-f("graphs") = {graph_1, graph_2};
-f("legends") = {"Without classification", "With classification"};
-f("xlabel") = "Position error (m)";
-f("ylabel") = "$P(X < x)$";
-create_figure(f);
+% unclass_x = unclass_estimated_pos(1,:);
+% unclass_y = unclass_estimated_pos(2,:);
+% class_x = class_estimated_pos(1,:);
+% class_y = class_estimated_pos(2,:);
+% error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
+% error_class = sqrt(sum(([class_x; class_y] - tx_pos(1:2)).^2));
+% 
+% % h = cdfplot(error_unclass); set(h, 'LineWidth', 2); title('');
+% % graph_1.y_data = h.YData;
+% % graph_1.x_data = h.XData;
+% [y_data, x_data] = ecdf(error_unclass);
+% graph_1.y_data = y_data;
+% graph_1.x_data = x_data;
+% 
+% [y_data, x_data] = ecdf(error_class);
+% graph_2.y_data = y_data;
+% graph_2.x_data = x_data;
+% 
+% mean_pos_error_unclass = mean(error_unclass);
+% max_pos_error_unclass = max(error_unclass);
+% 
+% mean_pos_error_class = mean(error_class);
+% max_pos_error_class = max(error_class);
+% 
+% f = containers.Map();
+% f("figure_name") = "simulation_5_2";
+% f("graphs") = {graph_1, graph_2};
+% f("legends") = {"Without classification", "With classification"};
+% f("xlabel") = "Position error (m)";
+% f("ylabel") = "$P(X < x)$";
+% create_figure(f);
 
 %% Simulation 6: AoA estimation error dependency on AoA elevation
 % Simulation setup BEGIN %
 M_f = 16; % frequencies
 M_1 = 4; % rows in the antenna array
 M_2 = 4; % columns in the antenna array
-K_threshold = 1;
-num_observations = 500;
-angle_of_arrival = (pi/180)*[60;20]; % [elevation, azimuth]
+K_threshold = 2;
+num_observations = 1000;
+angle_of_arrival = (pi/180)*[30;20]; % [elevation, azimuth]
 % Simulation setup END %
 
 % Simulation block BEGIN %
 elevations = (pi/180)*(0:2:90);
 
-K = 0.1;
+K = 1;
 mean_aoa_errors = 1:length(elevations);
+mean_aoa_errors_class = 1:length(elevations);
 for el_idx = 1:numel(elevations)
     angle_of_arrival = [elevations(el_idx);angle_of_arrival(2)];
     results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
     mean_aoa_errors(el_idx) = mean(results("unclass_doa_error"));
+    mean_aoa_errors_class(el_idx) = mean(results("class_doa_error"));
 end
 graph_1.y_data = mean_aoa_errors;
 graph_1.x_data = (180/pi)*elevations;
 
-K = 1;
-mean_aoa_errors = 1:length(elevations);
-for el_idx = 1:numel(elevations)
-    angle_of_arrival = [elevations(el_idx);angle_of_arrival(2)];
-    results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
-    mean_aoa_errors(el_idx) = mean(results("unclass_doa_error"));
-end
-graph_2.y_data = mean_aoa_errors;
+graph_2.y_data = mean_aoa_errors_class;
 graph_2.x_data = (180/pi)*elevations;
 
 K = 4;
@@ -299,19 +301,68 @@ for el_idx = 1:numel(elevations)
     angle_of_arrival = [elevations(el_idx);angle_of_arrival(2)];
     results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
     mean_aoa_errors(el_idx) = mean(results("unclass_doa_error"));
+    mean_aoa_errors_class(el_idx) = mean(results("class_doa_error"));
 end
 graph_3.y_data = mean_aoa_errors;
 graph_3.x_data = (180/pi)*elevations;
 
+graph_4.y_data = mean_aoa_errors_class;
+graph_4.x_data = (180/pi)*elevations;
 % Simulation block END %
+
 f = containers.Map();
-f("figure_name") = "simulation_6";
-f("graphs") = {graph_1, graph_2, graph_3};
-f("legends") = {"$K=0.5$", "$K=1$", "$K=4$"};
-f("xlabel") = "Elevation (º)";
-f("ylabel") = "Mean AoA error (º)";
+f("figure_name") = "simulation_6_1";
+f("graphs") = {graph_1, graph_3};
+f("legends") = {"$K=1$", "$K=4$"};
+f("xlabel") = "Elevation ($^\circ$)";
+f("ylabel") = "Mean AoA error ($^\circ$)";
+f("linestyles") = {'-', '--'};
+f("ylim") = [0 5];
 create_figure(f);
 
+% Simulation block BEGIN %
+angle_of_arrival = (pi/180)*[30;20];
+azimuths = (pi/180)*(0:2:360);
+
+K = 1;
+mean_aoa_errors = 1:length(azimuths);
+mean_aoa_errors_class = 1:length(azimuths);
+for az_idx = 1:numel(azimuths)
+    angle_of_arrival = [angle_of_arrival(1);azimuths(az_idx)];
+    results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
+    mean_aoa_errors(az_idx) = mean(results("unclass_doa_error"));
+    mean_aoa_errors_class(az_idx) = mean(results("class_doa_error"));
+end
+graph_1.y_data = mean_aoa_errors;
+graph_1.x_data = (180/pi)*azimuths;
+
+graph_2.y_data = mean_aoa_errors_class;
+graph_2.x_data = (180/pi)*azimuths;
+
+K = 4;
+mean_aoa_errors = 1:length(azimuths);
+for az_idx = 1:numel(azimuths)
+    angle_of_arrival = [angle_of_arrival(1);azimuths(az_idx)];
+    results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
+    mean_aoa_errors(az_idx) = mean(results("unclass_doa_error"));
+    mean_aoa_errors_class(az_idx) = mean(results("class_doa_error"));
+end
+graph_3.y_data = mean_aoa_errors;
+graph_3.x_data = (180/pi)*azimuths;
+
+graph_4.y_data = mean_aoa_errors_class;
+graph_4.x_data = (180/pi)*azimuths;
+% Simulation block END %
+
+f = containers.Map();
+f("figure_name") = "simulation_6_2";
+f("graphs") = {graph_1, graph_3};
+f("legends") = {"$K=1$", "$K=4$"};
+f("xlabel") = "Azimuth ($^\circ$)";
+f("ylabel") = "Mean AoA error ($^\circ$)";
+f("ylim") = [0 5];
+f("linestyles") = {'-', '--'};
+create_figure(f);
 %% Simulation 7: Position estimation error dependency on AoA elevation
 % Simulation setup BEGIN %
 M_f = 16; % frequencies
@@ -326,7 +377,7 @@ angle_of_arrival = (pi/180)*[60;20]; % [elevation, azimuth]
 elevations = (pi/180)*(0:1:90);
 
 K = 0.5;
-mean_pos_errors = 1:length(elevations);
+mean_aoa_errors = 1:length(elevations);
 for el_idx = 1:numel(elevations)
     angle_of_arrival = [elevations(el_idx);angle_of_arrival(2)];
     results = aoa_simulation(K, K_threshold, [M_f;M_1;M_2], num_observations, angle_of_arrival);
@@ -336,7 +387,7 @@ for el_idx = 1:numel(elevations)
     unclass_y = unclass_estimated_pos(2,:);
     error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
 
-    mean_pos_errors(el_idx) = mean(error_unclass);
+    mean_aoa_errors(el_idx) = mean(error_unclass);
 end
 graph_1.y_data = mean_aoa_errors;
 graph_1.x_data = (180/pi)*elevations;
@@ -352,7 +403,7 @@ for el_idx = 1:numel(elevations)
     unclass_y = unclass_estimated_pos(2,:);
     error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
 
-    mean_pos_errors(el_idx) = mean(error_unclass);
+    mean_aoa_errors(el_idx) = mean(error_unclass);
 
 end
 graph_2.y_data = mean_aoa_errors;
@@ -369,7 +420,7 @@ for el_idx = 1:numel(elevations)
     unclass_y = unclass_estimated_pos(2,:);
     error_unclass = sqrt(sum(([unclass_x; unclass_y] - tx_pos(1:2)).^2));
 
-    mean_pos_errors(el_idx) = mean(error_unclass);
+    mean_aoa_errors(el_idx) = mean(error_unclass);
 end
 graph_3.y_data = mean_aoa_errors;
 graph_3.x_data = (180/pi)*elevations;
